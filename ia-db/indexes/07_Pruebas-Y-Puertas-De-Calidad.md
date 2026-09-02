@@ -1,12 +1,13 @@
 # 07 · Pruebas y puertas de calidad
 
 > **Propósito:** qué se prueba, dónde, con qué instrumento se mide y qué puerta detiene el trabajo.
-> **Fuente primaria:** `tests/`, `scripts/coverage.sh`, `tools/informe-cobertura.cs`,
-> `coverlet.runsettings` y `SDD/Docs/Unidades-Entrega/*/08-Calidad-Y-Pruebas/`.
+> **Fuente primaria:** `tests/`, `scripts/coverage.sh`, `scripts/pruebas-e2e.sh`,
+> `tools/informe-cobertura.cs`, `coverlet.runsettings`, `pruebas-e2e.runsettings` y
+> `SDD/Docs/Unidades-Entrega/*/08-Calidad-Y-Pruebas/`.
 
 ---
 
-## 1. Las tres baterías
+## 1. Las tres baterías de la solución
 
 **xUnit 2.9.2** sobre `Microsoft.NET.Test.Sdk` 17.12.0, con `Microsoft.AspNetCore.Mvc.Testing`
 10.0.11 en la de integración y `coverlet.collector` 6.0.4 en las tres.
@@ -30,6 +31,45 @@ cuentas; `FigureValidatorBatteryTests` (14) y `FigureDerivationTests` (9) para l
 `SecurityGuardsTests` (11), `SessionCookieTests` (7), `ProvisioningGateTests` (11) y
 `PanelSessionGateTests` (6) para las guardias; `ContractCoverageTests` y
 `ApiDocumentationSurfaceTests` para el contrato y su descripción.
+
+---
+
+## 1.bis La cuarta batería, que no está en la solución
+
+**`tests/GeometriaFactory.E2ETests` — NUnit 4 + Playwright, 32 casos en ocho clases.** Abre un
+navegador de verdad contra la pieza pública y hace lo que hace una persona.
+
+**No está en `GeometriaFactory.sln` a propósito**, y es la decisión más importante de su archivo de
+proyecto: `scripts/test.sh` corre la solución entera y es `QG-02` de cada pull request. **Tampoco
+referencia ningún proyecto del producto**: lo único que ve es lo que ve una persona.
+
+**Dos modos, y el interruptor es la variable `URL_BASE`:**
+
+| Modo | Cuándo | Qué monta | Secretos |
+| --- | --- | --- | --- |
+| **Banco local** (sin `URL_BASE`) | Antes de empujar, y en cada cambio en la máquina de integración | `Infraestructura/BancoLocal.cs` **publica y levanta el producto entero** con almacén propio y puertos que le pide al sistema | **ninguno** |
+| **Desplegado** (con `URL_BASE`) | A mano, y después de publicar | Nada: prueba el sitio publicado, sembrando y limpiando lo suyo | cuatro |
+
+```bash
+scripts/pruebas-e2e.sh            # banco local, chromium
+scripts/pruebas-e2e.sh firefox    # otro navegador (chromium, firefox, webkit)
+```
+
+Corre dentro del contenedor de `deploy/e2e/Dockerfile` —el anfitrión no tiene kit de desarrollo ni
+las bibliotecas que piden los navegadores— y en la máquina de integración con
+`.github/workflows/e2e.yml`, sobre el runner propio `[self-hosted, i7infra-dev]`.
+
+**Lo que esta batería ve y las otras tres no:** la pantalla. Las tres de la solución llegan al punto
+de acceso del servicio de datos. Cuatro reportes del Product Owner del tipo «el botón no funciona»
+convivieron con ellas en verde, y el `P0` `MI-02` —los tres listados **sin dibujar ninguna fila** por
+debajo de 768 px— sobrevivió catorce días. `DisenoResponsivoTests` es la clase que cuida eso.
+
+**Lo que NO ve:** un defecto que dependa de la marca `Secure` de la cookie —el banco local corre
+sobre HTTP— y las propiedades de la escena 3D, que tienen su propio sensado. Los cuatro
+apartamientos están declarados en
+`SDD/Docs/Unidades-Entrega/GeometriaFactory-Web/08-Calidad-Y-Pruebas/Pruebas-Extremo-A-Extremo.md`.
+
+**No es puerta bloqueante de rama**: esa decisión es del Product Owner.
 
 ---
 
@@ -123,4 +163,6 @@ bash scripts/coverage.sh     # 0, y 2 NO es aprobación
 git status --short           # el árbol dice sólo lo que se tocó
 # y si el cambio toca una etapa con puerta propia:
 bash scripts/verify-stage-<letra>.sh
+# y si el cambio toca la pantalla:
+bash scripts/pruebas-e2e.sh  # banco local: no pide secretos ni toca datos ajenos
 ```
