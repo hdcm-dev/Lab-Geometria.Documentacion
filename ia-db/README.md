@@ -20,7 +20,7 @@
 | Los puntos de acceso HTTP, los tipos de transferencia y los códigos de error | [`indexes/04_Superficie-HTTP-Y-Contratos.md`](indexes/04_Superficie-HTTP-Y-Contratos.md) |
 | Las pantallas del front, sus guardianes de sesión y la fachada del visor 3D | [`indexes/05_Front-Web-Y-Visor-3D.md`](indexes/05_Front-Web-Y-Visor-3D.md) |
 | Cómo se persiste, cómo se migra el esquema y cómo se firma el acceso | [`indexes/06_Persistencia-Y-Seguridad.md`](indexes/06_Persistencia-Y-Seguridad.md) |
-| Las tres baterías de prueba, las puertas de calidad y sus umbrales | [`indexes/07_Pruebas-Y-Puertas-De-Calidad.md`](indexes/07_Pruebas-Y-Puertas-De-Calidad.md) |
+| Las cuatro baterías de prueba, las puertas de calidad y sus umbrales | [`indexes/07_Pruebas-Y-Puertas-De-Calidad.md`](indexes/07_Pruebas-Y-Puertas-De-Calidad.md) |
 | Cómo se construye, se corre y se despliega; los guiones y los contenedores | [`indexes/08_DevOps-Construccion-Y-Despliegue.md`](indexes/08_DevOps-Construccion-Y-Despliegue.md) |
 | Los ejemplos ejecutables de `samples/` y qué muestra cada uno | [`indexes/09_Samples-Ejecutables.md`](indexes/09_Samples-Ejecutables.md) |
 | Cómo se nombra algo antes de escribirlo, y qué significa cada término | [`indexes/10_Glosario-Y-Nomenclatura.md`](indexes/10_Glosario-Y-Nomenclatura.md) |
@@ -113,4 +113,7 @@ Lab-Geometria/
 - Exclusiones  : `.git`, `.vscode`, `bin/`, `obj/`, `node_modules/`, `TestResults/`, `visor/dist/`,
   `.publish-web/`, archivos de base de datos y todo lo ignorado por el `.gitignore` del proyecto
 - Generado     : 2026-08-31 · Versión: 1.0
+- Actualizado  : 2026-09-02 · Versión: 1.1 — `07` incorpora la **cuarta batería**, la de extremo a
+  extremo (`tests/GeometriaFactory.E2ETests`), con sus dos modos de corrida, cómo se la ejecuta y
+  qué NO puede ver. Es incremental: ningún otro índice cambió
 - Actualizar   : `/IA/PROMPTs/IA.Prompts/Tool-Prompts/Indexado-Documentado/Actualizar-Indexado.md`
