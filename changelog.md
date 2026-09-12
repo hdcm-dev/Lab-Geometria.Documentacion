@@ -9,6 +9,46 @@ diferencia se repara acá, nunca al revés.
 
 ---
 
+## 2026-09-11 — Regeneración completa de `ia-db/`: versión 3.0
+
+**Generada por** `/IA/PROMPTs/IA.Prompts/Tool-Prompts/Indexado-Documentado/Iniciar-Indexado.md`,
+invocada desde `PROMPTs/Indexado/Crear-Indexado.md`, bajo el Profile `Knowledge-Indexing`.
+**Alcance:** `PROG2/Geometria/Lab-Geometria`, rama `main`, revisión `89f3ab3` (PR #186, 2026-09-06).
+
+### Cambiado
+
+- **Los quince archivos de `ia-db/`**, reescritos de punta a punta: `README.md` y los trece índices.
+  Cada magnitud se volvió a contar sobre su instrumento y cada afirmación se volvió a abrir en su
+  fuente; el manifiesto pasa de la versión 1.0 a la **3.0** y fecha lo que declara al 2026-09-11.
+- `README.md` — el estado ya no es «etapas `a` a `h` cerradas» a secas: después de la `h` entraron
+  la batería de extremo a extremo, dos mesas de UX/UI y la imagen de contenedor del front. El
+  corpus se cuenta con sus vivos aparte de `_legacy/` (1.147 archivos, 542 vivos).
+- `08_DevOps-Construccion-Y-Despliegue.md` §4 — **las dos imágenes**: `deploy/Dockerfile` del
+  servicio de datos y `deploy/Dockerfile.web` del front, que el PR #186 agregó.
+- `11_Decisiones-Auditorias-Y-Pendientes.md` §5.3 — el PR #186 queda registrado como **sin
+  entrada** en el `changelog.md` del producto ni documento en `Web/09-Devops/`.
+- `12_Observaciones-Del-Indexado.md` — las observaciones pasan de `OBS-nn` a `O-n`, se agrega la
+  sección «Lo que sí cuadró», y la lista queda en **nueve**: las ocho de la base 2.0 siguen vigentes
+  y se suma `O-9`, `Dockerfile.web` existe y ninguna fuente documental lo registra.
+
+### Decisiones
+
+- **Regenerar y no actualizar.** El Product Owner invocó `Crear-Indexado.md` y no
+  `Actualizar-Indexado.md`, aunque entre `f527e5a` y `89f3ab3` haya un solo archivo nuevo. La
+  regeneración vuelve a medir todo; la actualización parcial sigue siendo la vía prevista para lo
+  que venga.
+- **La base 2.0 del 2026-09-06 no quedó versionada acá.** Este repositorio pasa de la 1.0 —con la
+  cuarta batería sumada el 2026-09-02— a la 3.0; la 2.0 existió en el árbol de trabajo y es la
+  procedencia que el manifiesto declara, pero no tiene commit propio.
+- **Ninguna observación se corrigió.** Escribir sobre `SDD/`, `changelog.md` o `samples/` no es
+  alcance de un indexado.
+
+### Cómo mantenerla
+
+Sin cambios: `Actualizar-Indexado.md` lee el manifiesto y actualiza sólo los índices afectados.
+
+---
+
 ## 2026-08-31 — Base de conocimiento `ia-db/` del proyecto `Lab-Geometria`
 
 **Generada por** `/IA/PROMPTs/IA.Prompts/Tool-Prompts/Indexado-Documentado/Iniciar-Indexado.md`,

@@ -1,159 +1,166 @@
-# 03 · Dominio, casos de uso y reglas de negocio
+# 03 · Dominio y reglas de negocio — qué es verdad siempre
 
-> **Propósito:** el vocabulario del dominio con sus conjuntos cerrados, y el catálogo de necesidades,
-> casos de uso y reglas que el producto tiene que cumplir.
-> **Fuente primaria:** `src/GeometriaFactory.Domain/`, `src/GeometriaFactory.Application/`,
-> `SDD/Docs/01-Necesidades-Negocio/` y
-> `SDD/Docs/Unidades-Entrega/*/02-Especificacion-Funcional/`.
+> **Propósito.** Las entidades, los conjuntos cerrados, los nueve invariantes, las dieciséis
+> reglas y el catálogo de condiciones, para poder razonar sobre el producto sin abrir el código.
+> **Fuente primaria.** `src/GeometriaFactory.Domain/`, `PRODUCT-INTAKE` §14,
+> `Api/02-Especificacion-Funcional/Reglas-De-Negocio/` y
+> `src/GeometriaFactory.Infrastructure/Figures/LocalFigureValidator.cs` (631 líneas). Verificado
+> el 2026-09-11 sobre la revisión `89f3ab3`.
 
 ---
 
 ## 1. Las cinco entidades
 
-| Entidad | Qué es | Nota que decide su forma |
+| Entidad | Qué es | Campos |
 | --- | --- | --- |
-| `Account` | Cuenta de la comisión. Una fila por persona, alumno o administrador | La identidad la da el **correo normalizado** (`EmailIdentity`) |
-| `Work` | Trabajo entregado por un alumno: una fila por entrega, con dueño, identidad propia y estado | El texto original se conserva **íntegro** (`RN-02008`, `RC-06001`) |
-| `Piece` | Cada figura del conjunto raíz del trabajo | **Su identidad es su posición** en ese conjunto: el dato del alumno no trae identificador (`RC-06002`) |
-| `Component` | Figura plana que forma parte de una pieza | Su lugar dentro de la pieza es contiguo desde 0 |
-| `Observation` | Lo que el producto emite al interpretar: advertencia o error de validación | Sólo el error de validación impide el paso a `Submitted` |
+| `Account` | La cuenta del alumno o del administrador | `Id`, `Email`, `NormalizedEmail`, `FirstName`, `LastName`, `Role`, `Status`, `PasswordHash?`, `MustChangePassword`, `CreatedAt` |
+| `Work` | El trabajo que el alumno carga | `Id`, `OwnerId`, `Name`, `DeclaredDate` (texto, no fecha), `Description?`, **`OriginalJson`**, `Status`, `AdministratorComment?`, `RootFigureCount?`, `CreatedAt`, `UpdatedAt` |
+| `Piece` | Cada figura del conjunto raíz. **Su identidad es su posición**, porque el dato del alumno no trae identificador | `Position`, `Type`, `DeclaredArea?`/`DerivedArea?`, `DeclaredVolume?`/`DerivedVolume?`, `DeclaredLength?`, `DeclaredWidth?`, `DeclaredRadius?` |
+| `Component` | Figura plana que forma parte de una pieza | `Position`, `Role`, `Type`, `DeclaredLength?`, `DeclaredWidth?`, `DeclaredRadius?`, `DeclaredArea?` |
+| `Observation` | Lo que el producto emite al interpretar | `Kind`, `PiecePosition?`, `Field`, `DeclaredValue?`, `DerivedValue?` |
+
+**El par declarado/derivado es el motivo de existir del producto.** No es un detalle de
+implementación: es lo que hace visible el error de fórmula del programa del alumno.
+
+**`OriginalJson` se conserva íntegro y sin normalizar** (`RN-02008`). Ninguna capa lo reescribe.
+**`DeclaredDate` es un `string`**: la fecha que el alumno declaró se conserva como la escribió y el
+front sólo la presenta (`Services/DeclaredDateText.cs`).
 
 ## 2. Los conjuntos cerrados
 
-| Conjunto | Valores (identidad de código → etiqueta) |
-| --- | --- |
-| `WorkStatus` | `Draft` «Borrador» · `Submitted` «Pendiente» · `Approved` «Finalizado» · `Rejected` «Rechazado» |
-| `AccountStatus` | `Pending` «Pendiente» · `Enabled` · `Blocked` |
-| `Role` | `Student` «Alumno» · `Administrator` «Administrador» |
-| `FigureType` | `Cylinder` · `Cube` · `Orthohedron` · `Rectangle` · `Square` · `Circle` · `DevelopedRectangle` (siete, y son etiquetas **del emisor**) |
-| `ComponentRole` | `Cap` «Tapa» · `Face` · `Base` · `Lateral` · `Side` |
-| `ObservationKind` | Advertencia · Error de validación |
-| `WorkOutcome` | Aprobar (→ `Approved`) · Rechazar (→ `Rejected`) — **los dos son terminales** |
-| `WorkOperation` | `View` (la admiten las dos resoluciones) · `Edit` (**sólo** la del alumno) · `Delete` (las dos, con alcances opuestos) |
+De `src/GeometriaFactory.Domain/Values/`. **Los valores son ingleses en el código y castellanos en
+la pantalla**, con la correspondencia fijada por la decisión `F-02` de la norma de nombres.
 
-`FigureType` y `ComponentRole` llevan **el vocabulario del emisor**: son las etiquetas que el texto
-del alumno trae, no una taxonomía propia del producto (decisión `F-02` de la norma de nomenclatura).
-
-## 3. Los códigos de condición del dominio
-
-`ConditionCode` es el catálogo cerrado de motivos internos. Entre otros:
-`REQUIRED_FIELD_MISSING`, `EMAIL_UNIQUENESS_NOT_VERIFIED`, `ACCOUNT_PENDING`, `ACCOUNT_BLOCKED`,
-`ACCOUNT_TRANSITION_NOT_ALLOWED`, `ADMINISTRATOR_ALREADY_CONFIGURED`, `CREDENTIAL_ALREADY_SET`,
-`CURRENT_CREDENTIAL_NOT_VERIFIED`, `PASSWORD_CHANGE_PENDING`, `EDIT_OUTSIDE_DRAFT`,
-`SUBMISSION_OUTSIDE_DRAFT`, `OUTCOME_OUTSIDE_SUBMITTED`, `OUTCOME_REQUIRES_ADMINISTRATOR_ROLE`,
-`TRANSITION_FROM_TERMINAL_STATUS`, `ORIGINAL_JSON_ALTERED`, `ERROR_WITHOUT_LOCATION`,
-`OBSERVATION_ON_MISSING_PIECE`, `DELETION_WITHOUT_WORK_CASCADE`, `RESET_WITH_WORK_CASCADE`.
-
-**Un motivo interno no es un código de contrato.** La traducción de uno a otro vive en
-`Api/Endpoints/ContractTranslation.cs` — ver
-[`04_Superficie-HTTP-Y-Contratos.md`](04_Superficie-HTTP-Y-Contratos.md).
-
----
-
-## 4. Las nueve necesidades de negocio
-
-| Id | Necesidad |
-| --- | --- |
-| `NB-00001` | Control de admisión al laboratorio |
-| `NB-00002` | Identidad propia del alumno, **sin correo** de verificación |
-| `NB-00003` | Trabajo con dueño, estado y persistencia |
-| `NB-00004` | Interpretación **fiel** del dato del alumno |
-| `NB-00005` | Visibilidad del error de cálculo |
-| `NB-00006` | Visualización dentro del producto |
-| `NB-00007` | Revisión de la comisión en un solo lugar |
-| `NB-00008` | Alcance del laboratorio desde el aula |
-| `NB-00009` | Desenlace explícito de la entrega |
-
-## 5. Los casos de uso
-
-### 5.1 Unidad `GeometriaFactory-Api` — nueve
-
-| Id | Caso de uso | Realizado por |
+| Conjunto | Valores | Nota |
 | --- | --- | --- |
-| `CU-00021` | Dar de alta una cuenta de alumno | `RegisterAccountUseCase` |
-| `CU-00022` | Ingresar al laboratorio y sostener la sesión | `ResolveSignInUseCase` + `AccessTokenIssuer` |
-| `CU-00023` | Gobernar las cuentas de la comisión | `GovernCommissionAccountsUseCase` |
-| `CU-00024` | Resetear la contraseña de un alumno | `ResetStudentPasswordUseCase` |
-| `CU-00025` | Configurar la cuenta de administrador en el primer arranque | `ConfigureAdministratorUseCase` |
-| `CU-00026` | Enviar un trabajo y ver sus observaciones | `LoadAndEditOwnWorkUseCase` + `LocalFigureValidator` |
-| `CU-00027` | Eliminar un trabajo | `DeleteWorkUseCase` |
-| `CU-00028` | Consultar el listado y el detalle de los trabajos | `ConsultOwnWorksUseCase` / `ReviewCommissionWorksUseCase` |
-| `CU-00029` | Dar desenlace a la revisión | `ResolveWorkUseCase` |
+| `AccountStatus` | `Pending`, `Enabled`, `Blocked` | El administrador está **siempre** `Enabled` (`INV-08`) |
+| `Role` | `Student`, `Administrator` | Dos papeles fijos; no hay permisos finos |
+| `WorkStatus` | `Draft`, `Submitted`, `Approved`, `Rejected` | En pantalla: `Borrador`, `Pendiente`, `Finalizado`, `Rechazado` (`ContractTranslation.cs`). `Approved` y `Rejected` son **terminales** (`INV-07`) |
+| `WorkOutcome` | `Approve`, `Reject` | Las dos decisiones del administrador |
+| `WorkOperation` | `View`, `Edit`, `Delete` | Lo que se pide sobre un trabajo |
+| `FigureType` | `Cylinder`, `Cube`, `Orthohedron`, `Rectangle`, `Square`, `Circle`, `DevelopedRectangle` | Siete tipos |
+| `ComponentRole` | `Cap`, `Face`, `Base`, `Lateral`, `Side` | Tapa, cara, base, lateral, lado |
+| `ObservationKind` | `Warning`, `ValidationError` | La advertencia **no impide** pasar a `Submitted`; el error sí |
 
-Las **catorce operaciones internas** (`CU-00009` a `CU-00011` y `CU-06001` a `CU-06010`) están en
-`05-Arquitectura-Tecnica/Operaciones-Internas/`: interpretar el texto, verificar declarado contra
-derivado, guardar y recuperar, borrado físico con arrastre, derivar contraseña, producir la
-provisoria, emitir el acceso firmado, proveer el reloj y preparar el almacén.
+`WorkOutcomeRequest` **no lleva el estado pretendido**: se pide un desenlace y el dominio decide a
+qué estado lleva. Que el tipo no lo declare es lo que vuelve imposible pedirlo.
 
-### 5.2 Unidad `GeometriaFactory-Web` — diez
+`EmailIdentity.Normalize` es **el único normalizador de correos del producto** (`ADR-06003`).
 
-`CU-10001` registrar la cuenta · `CU-10002` iniciar y cerrar sesión sin exponer la credencial ·
-`CU-10003` establecer y cambiar la contraseña propia · `CU-10004` administrar las cuentas de la
-comisión · `CU-10005` enviar un trabajo y ver la interpretación · `CU-10006` consultar el listado
-propio y operar sobre el borrador · `CU-10007` abrir un trabajo y explorarlo en escena y árbol ·
-`CU-10008` recorrer la entrega de la comisión · `CU-10009` resolver un trabajo con comentario
-opcional · `CU-10010` sostener la aplicación en estado degradado y reconexión.
+## 3. Los nueve invariantes (`PRODUCT-INTAKE` §14)
 
----
+Un invariante es lo que tiene que ser verdad **siempre**, aunque la petición llegue por fuera de
+la interfaz.
 
-## 6. Las dieciséis reglas de negocio (`RN-020XX`)
+| Id | Enunciado | Regla asociada |
+| --- | --- | --- |
+| `INV-01` | El correo del alumno es único en todo el sistema | `RN-02002` |
+| `INV-02` | Un alumno sólo accede a sus propios trabajos | `RN-02003` |
+| `INV-03` | Un trabajo eliminado **por un alumno** estaba en `Borrador` y le pertenecía | `RN-02004` |
+| `INV-04` | Un trabajo `Finalizado` tiene texto interpretado sin errores (puede tener advertencias) | `RN-02005` |
+| `INV-05` | Existe **exactamente un** administrador; su alta sólo es posible mientras no exista ninguno | `RN-02001` |
+| `INV-06` | Un alumno `Pendiente` o `Bloqueado` no obtiene credencial | `RN-02006` |
+| `INV-07` | Un trabajo `Finalizado` o `Rechazado` no cambia de estado ni de contenido | `RN-02010` |
+| `INV-08` | La cuenta administradora está **siempre** `Habilitado`: nace habilitada, nada la lleva a `Pendiente` ni a `Bloqueado`, y no admite baja. Toda cuenta de alumno nace `Pendiente` | `RN-02001`, `RN-02006` |
+| `INV-09` | Una cuenta con **cambio de contraseña pendiente** no ejerce ninguna capacidad salvo cambiar su propia contraseña. La marca la ponen sólo el reseteo y la habilitación, y la levanta sólo el cambio efectivo hecho por la propia cuenta | `RN-02012`, `RN-02013`, `RN-02016` |
 
-| Id | Regla |
+**`INV-08` no viene de las fuentes: lo propuso la categoría 02 del dominio** después de que la
+familia de defectos que su ausencia habilita se abriera dos veces por puertas distintas, las dos
+terminando con la instancia sin nadie capaz de habilitar, desbloquear ni revisar.
+
+## 4. Las dieciséis reglas de negocio
+
+`Api/02-Especificacion-Funcional/Reglas-De-Negocio/RN-02001..RN-02016`. **Diez tienen invariante
+asociado y seis no**, porque describen comportamientos o alcances de consulta y no condiciones
+permanentes sobre el estado.
+
+| Regla | Qué decide |
 | --- | --- |
 | `RN-02001` | Administrador único y papeles fijos |
 | `RN-02002` | Correo del alumno único |
-| `RN-02003` | Trabajo ajeno **indistinguible de inexistente** |
-| `RN-02004` | Eliminación acotada al borrador |
+| `RN-02003` | **Trabajo ajeno indistinguible de inexistente** |
+| `RN-02004` | Eliminación del alumno acotada al borrador |
 | `RN-02005` | Finalización sin errores de validación |
-| `RN-02006` | Cuenta pendiente o bloqueada, sin acceso |
-| `RN-02007` | Baja con arrastre y confirmación escrita |
+| `RN-02006` | Cuenta pendiente o bloqueada sin acceso |
+| `RN-02007` | Baja con arrastre y **confirmación escrita** del correo |
 | `RN-02008` | Texto original conservado íntegro |
 | `RN-02009` | Observación de error con posición y campo |
 | `RN-02010` | Desenlace exclusivo del administrador, y terminalidad |
-| `RN-02011` | El administrador **no ve los borradores** |
-| `RN-02012` | Reseteo conserva la cuenta y sus trabajos |
-| `RN-02013` | Cambio forzado antes de toda otra capacidad |
-| `RN-02014` | Provisoria producida por el sistema |
-| `RN-02015` | Reseteo independiente del estado de cuenta |
+| `RN-02011` | **El administrador no ve los borradores** |
+| `RN-02012` | Resetear conserva la cuenta y sus trabajos |
+| `RN-02013` | Cambio forzado **antes de toda otra capacidad** |
+| `RN-02014` | La provisoria la produce el sistema |
+| `RN-02015` | Resetear es **independiente del estado de cuenta** |
 | `RN-02016` | Habilitar produce la provisoria |
 
-## 7. Las siete reglas conceptuales de modelo (`RC-060XX`)
+**Las dos que más se malinterpretan.** `RN-02003`: pedir el trabajo de otro devuelve «no
+encontrado» y no «no autorizado» —decir «no autorizado» confirmaría que ese trabajo existe—.
+`RN-02016` cierra la escritura anónima **de contraseña**, no la escritura anónima: el registro de
+cuenta sigue siendo anónimo por diseño, y así debe seguir.
 
-`RC-06001` texto original escrito una sola vez · `RC-06002` identidad **posicional** de la pieza ·
-`RC-06003` valor declarado y derivado por separado · `RC-06004` la familia no se persiste ·
-`RC-06005` retiro físico con arrastre · `RC-06006` tres sellos de tiempo distintos ·
-`RC-06007` la marca no es un estado de cuenta.
+## 5. La superficie del dominio
 
----
+Métodos públicos, todos devolviendo `DomainResult` / `DomainResult<T>`: **no hay excepciones como
+mecanismo de flujo** (`ADR-02002`, resultados tipados).
 
-## 8. El ciclo de vida, en dos máquinas de estado
+| Entidad | Operaciones |
+| --- | --- |
+| `Account` | `ConfigureAdministrator`, `Register` (estáticas, crean) · `Enable(provisionalPasswordHash)`, `Block()`, `AdmitDeletion(worksCascadeDeclared)`, `ResetPassword(hash, worksCascadeDeclared)`, `ReplaceCredential(newHash, currentCredentialVerified)`, `EvaluateAdmission()` → `Admission` |
+| `Work` | `Create` (estática) · `Edit`, `AdoptInterpretation`, `Submit`, `ApplyOutcome`, `ResolveStudentAccess(requesterId, operation)`, `ResolveAdministratorScope(requesterRole, operation)` |
+| `Guards` | `Admission.Admissible()` / `Admission.NotAdmissible(reason)` — **la guarda única de admisibilidad** (`ADR-02005`) |
 
-```mermaid
-stateDiagram-v2
-  direction LR
-  [*] --> Draft: el alumno carga el trabajo
-  Draft --> Draft: reedita, o el envío deja errores de validación
-  Draft --> Submitted: envía y el texto interpreta sin errores
-  Draft --> [*]: elimina (sólo en borrador, RN-02004)
-  Submitted --> Approved: el administrador aprueba
-  Submitted --> Rejected: el administrador rechaza
-  Approved --> [*]
-  Rejected --> [*]
-```
+**Las firmas cuentan lo que el dominio no hace**: `Enable` y `ResetPassword` reciben el hash de la
+provisoria **ya derivado**, `ReplaceCredential` recibe el hecho de que la credencial actual **ya se
+verificó**, y `AdmitDeletion` recibe que el arrastre de trabajos **ya se declaró**. El dominio no
+deriva, no verifica y no consulta: decide sobre hechos que le entregan (`ADR-02006`).
 
-**«Enviar» es la única acción de guardado del alumno**: no hay una acción separada de guardar sin
-enviar. Los dos desenlaces son terminales y no existe camino de vuelta a `Pendiente`.
+## 6. El catálogo cerrado de condiciones
 
-```mermaid
-stateDiagram-v2
-  direction LR
-  [*] --> Pending: el alumno se registra, sin elegir contraseña
-  Pending --> Enabled: el administrador habilita, y eso PRODUCE la provisoria (RN-02016)
-  Enabled --> Blocked: el administrador bloquea
-  Blocked --> Enabled: rehabilita
-  Enabled --> [*]: baja, con arrastre y confirmación escrita (RN-02007)
-```
+`ConditionCode` (`Domain/Values/ConditionCode.cs`) declara **37 constantes**. Son la moneda
+interna: el dominio y la aplicación hablan en códigos de condición, y **una sola tabla** los
+traduce a códigos de contrato en la frontera (`ADR-00004`, ver
+[`04_Superficie-HTTP-Y-Contratos.md`](04_Superficie-HTTP-Y-Contratos.md)).
 
-El **reseteo** es independiente del estado de cuenta (`RN-02015`) y conserva los trabajos
-(`RN-02012`); deja la cuenta con **cambio forzado** pendiente, que antecede a toda otra capacidad
-(`RN-02013`).
+| Familia | Códigos |
+| --- | --- |
+| Forma de la petición | `RequiredFieldMissing`, `EmptyDerivedValue` |
+| Alta y unicidad | `AdministratorAlreadyConfigured`, `EmailUniquenessNotVerified`, `SetupWithoutCredential`, `InitialStatusNotNegotiable`, `CredentialNotAllowedOnRegistration`, `AdministratorRoleOutsideThisPath` |
+| Credencial | `AccountNotEnabledForCredential`, `CredentialAlreadySet`, `CurrentCredentialNotVerified`, `AccountPending`, `AccountBlocked`, `PasswordChangePending` |
+| Ciclo de vida de la cuenta | `AccountTransitionNotAllowed`, `EnableWithoutTemporaryCredential`, `DeletionWithoutWorkCascade`, `OperationNotApplicableToAdministratorAccount`, `ResetWithWorkCascade` |
+| Interpretación | `ObservationOnMissingPiece`, `ErrorWithoutLocation`, `WarningMissingBothValues`, `UnknownObservationKind`, `OriginalJsonAltered` |
+| Trabajo y alcance | `WorkWithoutOwner`, `EditOutsideDraft`, `WorkNotFoundForRequester`, `OperationOutsideDraft`, `UnknownOperation`, `WorkOutsideAdministratorScope`, `ScopeRequiresAdministratorRole`, `SubmissionOutsideDraft`, `SubmissionWithoutParseResult` |
+| Desenlace | `TransitionFromTerminalStatus`, `OutcomeOutsideSubmitted`, `OutcomeRequiresAdministratorRole`, `UnknownOutcome` |
+
+La capa de aplicación suma los suyos en `ApplicationConditionCode` (`EmailAlreadyRegistered`,
+`AccountNotFound`, `AdministratorRoleRequired`, `DeletionConfirmationMismatch`,
+`ResetLimitedToStudentAccounts`, `WorkNotFound`, `RequesterNotDeclared`, `UnrecognizedRole`) y
+la de infraestructura en `InfrastructureConditionCode` (`UnreadablePasswordHash`,
+`RandomnessSourceUnavailable`); estos dos viven en `Application/Accounts/`.
+
+**Varios describen un defecto del producto, no un pedido mal hecho.** Si alguno se alcanzara, la
+respuesta correcta es `500`: están inventariados en `Audit/Mesa-2026-08-31.md` y la traducción
+los deja deliberadamente en el genérico.
+
+## 7. La interpretación del texto y la derivación de valores
+
+La hace `LocalFigureValidator` (`Infrastructure/Figures/`), que implementa el puerto
+`IFigureValidator`. **La derivación es por tipo de figura**, con la tabla de `ADR-06006` (lectura
+tolerante y tabla de derivación por tipo), verificada sobre el código:
+
+| Tipo | Área derivada | Volumen derivado | Componentes que exige |
+| --- | --- | --- | --- |
+| `Rectangle`, `Square` | largo × ancho | — | ninguno en particular; si trae, al menos uno |
+| `Circle` | π r² | — | — |
+| `DevelopedRectangle` | del desarrollo | — | — |
+| `Cube` | de sus caras | arista³ | al menos una `Face` |
+| `Cylinder` | de tapas y lado | π r² h | una `Cap` **y** una `Side` |
+| `Orthohedron` | de base y laterales | largo × ancho × alto | una `Base` **y** una `Lateral` |
+
+Cuando el valor declarado y el derivado no coinciden, se emite una **advertencia** con los dos
+números; cuando el texto no se puede interpretar como figuras, se emiten **errores de validación**
+con posición y campo (`RN-02009`), y el trabajo queda en `Borrador`.
+
+**La batería obligatoria son diez casos**, declarada en `Api/08/Criterios-Validacion.md`
+`CV-00002` y ejercida por `FigureValidatorBatteryTests`; los ocho escenarios de datos `E-1` a
+`E-8` del intake §20 son el material de prueba y **no se inventan datos**. Los cuerpos
+ejecutables están en `samples/api/02-intermedio/cuerpos/`.

@@ -1,70 +1,93 @@
-# 09 · Samples ejecutables
+# 09 · Samples ejecutables — el camino más rápido para entender una capa
 
-> **Propósito:** decir qué muestra cada ejemplo y con qué comando corre. **Es el lugar más rápido
-> para entender qué hace de verdad una capa**, porque los ejemplos corren y se comparan renglón por
-> renglón contra el §6 de su documento.
-> **Fuente primaria:** `samples/` (el README de cada carpeta declara su estado y su comando) y las
-> categorías `10-Examples` de las dos unidades de entrega.
+> **Propósito.** Qué muestra cada sample, cuál corre y cuál no, y por qué es el mejor lugar para
+> ver qué hace **de verdad** una capa.
+> **Fuente primaria.** `samples/`, `samples/README.md`, las categorías `10-Examples` de las dos
+> unidades de entrega y `Audit/Reporte-Hallazgos-De-Los-Samples-2026-08-30.md`. Archivos contados
+> con `git ls-files` el 2026-09-11 sobre `89f3ab3`.
 
 ---
 
-## 1. Cómo está organizado, y por qué
+## 1. Qué son
 
-`Rules-Examples.md` §2.3 fija la estructura de `/samples` **suponiendo un proyecto de código por
-repositorio**. Este producto tiene **siete** en un solo repositorio, de modo que las carpetas base
-colisionarían. Se agrega por eso **un nivel de espacio de nombres por proyecto**:
-`/samples/<proyecto>/<XX-slug>/`. Es carpeta extra y **no renombre** de las base, que es lo único
-que §2.3 admite ajustar, y está declarado en los siete `README.md` de la categoría 10.
+`samples/` es la materialización en código de la categoría **10-Examples**. La categoría documenta
+el sample; el código vive acá. **Los samples corren y se comparan contra el §6 de su documento**, y
+donde no coinciden **lo declaran, renglón por renglón, con su motivo**. Es lo que los hace útiles:
+no ilustran la intención, muestran el comportamiento.
 
-**Diecinueve carpetas y diecinueve contratos de verificación**, uno a uno: 3 de Domain, 3 de
-Contracts, 3 de Application, 3 de Infrastructure, 3 de Api, 3 del Visor y 1 de Web.
+**Un segmento por proyecto de código.** La regla del framework supone un proyecto por repositorio;
+acá hay siete, de modo que la estructura es `samples/<capa>/<nivel>/` para que las carpetas base no
+colisionen. Es carpeta extra y no renombre de las base, que es lo único que la regla admite.
 
-## 2. Estado al 2026-08-31
+## 2. Los diecinueve, y cuáles tienen código
 
-| Carpetas | Estado |
-| --- | --- |
-| **16** — todas menos `contracts/` | **Implementadas.** Corren en 0 y comparan su salida contra el §6 de su documento; donde no coinciden **lo declaran, renglón por renglón, con su motivo** |
-| **3** — `contracts/01-basico`, `02-intermedio`, `03-avanzado` | **Esqueleto, sin código.** Sólo README y comando previsto |
-
-`domain/01-basico`, `domain/02-intermedio`, `domain/03-avanzado` e `infrastructure/01-basico` están
-además marcados como **verificados** (2026-08-29).
-
-> El `samples/README.md` general sigue fechado el **2026-08-11** y declara «Estado de todas las
-> carpetas: Esqueleto — sin código», que ya no es cierto para dieciséis de las diecinueve. Ver
-> [`12_Observaciones-Del-Indexado.md`](12_Observaciones-Del-Indexado.md).
-
-## 3. El catálogo
-
-| Carpeta | Proyecto | Comando | Qué muestra |
+| Capa · nivel | Qué muestra | Archivos versionados | Estado |
 | --- | --- | --- | --- |
-| `domain/01-basico` | Domain | `dotnet run --project samples/domain/01-basico` | Entidades e invariantes básicas |
-| `domain/02-intermedio` | Domain | ídem `02-intermedio` | Guardas y resultados tipados |
-| `domain/03-avanzado` | Domain | ídem `03-avanzado` | Ciclo de vida completo |
-| `contracts/01-basico` | Contracts | `dotnet run --project samples/contracts/01-basico` | La frontera de sesión y de cuentas: cuatro campos y ninguno que filtre. **Sin código** |
-| `contracts/02-intermedio` · `03-avanzado` | Contracts | ídem | **Sin código** |
-| `application/01-basico` … `03-avanzado` | Application | `dotnet run --project samples/application/<nivel>` | Casos de uso contra puertos falsos |
-| `infrastructure/01-basico` … `03-avanzado` | Infrastructure | `dotnet run --project samples/infrastructure/<nivel>` | Adaptadores, contexto y almacén reales (`Almacen.cs`, `Contexto.cs` propios del sample) |
-| `api/01-basico` | Api | `bash samples/api/01-basico/run.sh` | El canje, la guardia y el envío que no verifica: **por qué esa respuesta es exitosa** |
-| `api/02-intermedio` · `03-avanzado` | Api | `bash samples/api/<nivel>/run.sh` | Superficie completa y casos de borde |
-| `visor/01-basico` … `03-avanzado` | Visor | `bash scripts/build-visor.sh && npm --prefix samples/visor/<nivel> run verify` | La fachada ejercitada **sin backend**, con su anfitrión propio (`anfitrion.js` + `index.html`) |
-| `web/01-datos-seed` | Web | `bash samples/web/01-datos-seed/run.sh` | La comisión desde la que arranca el guion de demostración (`identidades.env.ejemplo`) |
+| `domain/01-basico` | Ciclo de vida de una cuenta, de la configuración del administrador a la admisibilidad | 9 | Con código |
+| `domain/02-intermedio` | Un trabajo real: constitución, adopción de la interpretación y envío | 16 | Con código |
+| `domain/03-avanzado` | Acceso, alcance del administrador y desenlace, con la superficie tipada bajo inspección | 13 | Con código |
+| `application/01-basico` | La cuenta entra al laboratorio: alta, administrador, credencial y **la guarda que corta primero** | 12 | Con código |
+| `application/02-intermedio` | Los ocho trabajos del alumno: carga, envío interpretado, consulta y retiro | 22 | Con código |
+| `application/03-avanzado` | El administrador: gobierno de cuentas, revisión, desenlace y reseteo | 14 | Con código |
+| `infrastructure/01-basico` | Leer el texto del alumno y verificar sus números, **sin abrir el almacén** | 12 | Con código |
+| `infrastructure/02-intermedio` | El almacén: guardar, recuperar con el recorte ya decidido, retirar y arrastrar | 15 | Con código |
+| `infrastructure/03-avanzado` | Los mecanismos que no guardan nada: credencial, provisoria, acceso firmado, reloj y arranque | 11 | Con código |
+| `api/01-basico` | El canje, la guardia y **el envío que no verifica: por qué esa respuesta es exitosa** | 13 | Con código, con `run.sh` |
+| `api/02-intermedio` | **La colección de peticiones reproducible**: los ocho escenarios contra la superficie ensamblada | 20 | Con código, con `run.sh` |
+| `api/03-avanzado` | Composición de raíz y arranque en dos fases: qué pasa antes de la primera petición | 9 | Con código, con `run.sh` |
+| `visor/01-basico` | La página integradora mínima: crear la escena, dibujar `E-1` y liberar | 9 | Con código |
+| `visor/02-intermedio` | Árbol y escena **sincronizados por índice**, y ninguna pieza que desaparezca sin aviso | 12 | Con código |
+| `visor/03-avanzado` | Las seis funciones sin backend, con los dos movimientos prendidos y **el contador de red en cero** | 14 | Con código |
+| `web/01-datos-seed` | La comisión desde la que arranca el guion de demostración | 13 | Con código, con `run.sh` |
+| `contracts/01-basico` | La frontera de sesión y de cuentas: cuatro campos y ninguno que filtre | 1 | **Sólo README** |
+| `contracts/02-intermedio` | Trabajo, listado y detalle: el texto original que viaja intacto y la proyección que no arrastra | 1 | **Sólo README** |
+| `contracts/03-avanzado` | Error, desenlace y reseteo, y una frontera que no filtra | 1 | **Sólo README** |
 
-Cada carpeta declara además su **contrato de verificación** `VER-XX` y su **sonda de sensado**
-`SD-XX`, que viven en la `Matriz-Sensado-Deriva.md` de la categoría 08 de su unidad.
+**Dieciséis con código, tres sin él.** Los tres de `contracts/` siguen en el estado de esqueleto de
+la pasada de diseño: llevan su README y su comando previsto, y **ninguno afirma lo contrario**.
+Es coherente con lo que el corpus cuenta —dieciséis samples implementados— pero **no con
+`samples/README.md`, que sigue diciendo que las diecinueve carpetas están sin código**; la
+divergencia está en [`12_Observaciones-Del-Indexado.md`](12_Observaciones-Del-Indexado.md) O-6.
 
-## 4. Qué dejaron los samples al implementarse
+## 3. Las tres muestras nombradas del intake §18
 
-La implementación de los dieciséis fue un instrumento de auditoría: corrió contra el producto real y
-**emitió catorce hallazgos**. Al 2026-08-31: **doce cerrados, dos retirados, cero vivos**
-(`SDD/Docs/Audit/Reporte-Hallazgos-De-Los-Samples-2026-08-30.md` §0, que es el índice vivo).
+| Muestra | Qué es | Dónde vive |
+| --- | --- | --- |
+| `S-1` | Página integradora sin backend, que prueba el punto de extensión | Las **tres** carpetas de `visor/`, que son sus tres partes |
+| `S-2` | Colección de peticiones HTTP de la API | `api/02-intermedio/` |
+| `S-3` | Juego de datos de los ocho escenarios, en archivos sueltos | Los archivos de escenario de `infrastructure/01-basico/` |
 
-Los que cambiaron el producto y conviene conocer:
+## 4. Cómo se corre cada clase
 
-| Hallazgo | Qué cambió |
+| Clase | Invocación |
 | --- | --- |
-| `H-03` | `POST /interpretaciones` estaba expuesto y sin contrato → adoptado como **`A-18`** |
-| `H-06` | El arranque detenido daba traza y síntoma → detenerse pasó a ser **una decisión, con salida `78`** |
-| `H-09` | El código `UNKNOWN` acuñado aguas abajo → retirado; la unión discriminada lo volvió imposible |
-| `H-10` | `RA-03` dependía de una variable de entorno → los dos entornos quedaron iguales |
-| `H-11` | Un defecto no previsto daba `500` vacío → nació `ContractErrorHandler`, con cuatro pruebas |
-| `H-13` | Siete samples no verificaban con su comando → la comparación corre siempre |
+| Samples .NET (`domain`, `application`, `infrastructure`) | `dotnet run --project samples/<capa>/<nivel>` (proyectos `Sample.<Capa>.<Nivel>.csproj`, con `Actos/`, `Dobles/`, `Escenarios/`, `Recorrido/` y `tests/` según el caso) |
+| Samples de superficie (`api/*`, `web/01-datos-seed`) | `bash samples/<capa>/<nivel>/run.sh`, contra un servicio levantado |
+| Samples del visor | `bash scripts/build-visor.sh && npm --prefix samples/visor/<nivel> run verify`: página integradora (`index.html` + `anfitrion.js`) con su `package.json` y su recorrido en `tests/*.mjs`, en el navegador |
+
+**El servicio de los samples de `api/` escucha en 5080**, y hay que levantarlo aparte con almacén
+propio: `gf-api` y `gf-web` son del Product Owner y no se tocan.
+
+Cada sample lleva su directorio `esperado/`, con la salida contra la que se compara —por ejemplo
+`samples/api/01-basico/esperado/salida.txt` y `codigos-del-contrato.txt`—, y `api/02-intermedio/`
+trae los cuerpos de los ocho escenarios en `cuerpos/E1.txt` … `E8.txt` más `escapar.awk`, **el
+escapador que existe porque la imagen del SDK no trae `jq` ni `python3`**. `api/03-avanzado/`
+trae sus propios `almacenes/`.
+
+**Los datos del visor van en dos archivos y hay un documento que explica por qué**
+(`samples/visor/01-basico/datos/POR-QUE-DOS-ARCHIVOS.md`): `E1.txt` es lo que el alumno pega y
+`E1-piezas.js` son las piezas ya reconstruidas, que es lo que el visor recibe (`ADR-08006`).
+
+## 5. Lo que los samples encontraron
+
+**El sample `api/03-avanzado` encontró un hueco del contrato**, contando sobre el documento OpenAPI
+que el propio servicio publica: **el servicio exponía diecisiete operaciones contra dieciséis
+declaradas** en `Contratos-REST.md`. El barrido de alcance de `ADR-08006` había llegado a la
+categoría 02 y no a la 05. Se cerró con la emisión 1.5 de ese contrato, el 2026-08-31.
+
+Los hallazgos que dejó la implementación de los samples están en
+`Audit/Reporte-Hallazgos-De-Los-Samples-2026-08-30.md`: **catorce emitidos, doce cerrados, dos
+retirados, cero vivos**.
+
+**Es el mejor lugar para entrar a una capa**, y por eso `AGENTS.md` lo dice: los samples corren, y
+donde no coinciden con su documento lo declaran por escrito.
