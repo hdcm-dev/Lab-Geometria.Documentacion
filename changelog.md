@@ -9,6 +9,40 @@ diferencia se repara acá, nunca al revés.
 
 ---
 
+## 2026-09-13 — Se versionan `Analisis/` y `PROMPTs/`
+
+Hasta hoy el repositorio sólo llevaba `ia-db/` y este registro; el corpus de análisis y los prompts
+con que se condujo el proyecto vivían en el árbol de trabajo, sin commit. Este cambio los versiona
+tal como estaban: no se editó ninguno de los archivos.
+
+### Agregado
+
+- `Analisis/` — los dos documentos fundacionales del 2026-08-08:
+  `01-Analisis-Contexto-Existente/Analisis-Contexto-Existente.md`, el análisis integrado de
+  `tup_prog_2_2026_actividad1` y `tools_json_figure_viewer`, y
+  `02-Definicion-Ideas/Definicion-Idea.md`, el plan del servicio académico que el Product Owner
+  escribió a partir de él.
+- `PROMPTs/SDD/` — la secuencia con la que se ejecutó el SDD, numerada del `01` al `06`: crear el
+  análisis, integrar el documento de intake (con sus `INPUTs/` de requerimientos funcionales y
+  técnicos), ejecutar y reanudar el orquestador, hallazgos y cierre, y el catalogado, cuyo
+  `README.md` queda creado vacío.
+- `PROMPTs/Fixs/` — los dos ajustes de UX: `01-Ajuste-UX`, con los informes de comisión por eje
+  (A–F) y por usuario (US-1 a US-3) en `OUTPUTs/`, y `02-Ajuste-UX-2.0`, con el prompt de revisión,
+  la revisión agéntica y la evidencia en capturas del 2026-09-02.
+- `PROMPTs/Features/01-Crear-Diseñar-Pruebas-E2E/` — el prompt de la batería de extremo a extremo.
+- `PROMPTs/Indexado/` — `Crear-Indexado.md` y `Actualizar-Indexado.md`, los que este registro ya
+  citaba como origen de `ia-db/` sin que estuvieran en el repositorio.
+- `PROMPTs/Analisis/`, `PROMPTs/Guides/` — vacías, sostenidas por `.gitkeep`.
+
+### Decisiones
+
+- **`PROMPTs/` es del Product Owner.** Se versiona para que quede la procedencia de cada entrega,
+  no para que un agente lo edite: las carpetas `PROMPTs/` se leen, no se escriben.
+- **Los prompts entran con sus `OUTPUTs/` y evidencia** (3,4 MB, casi todo capturas PNG) porque sin
+  ellos el informe de cada mesa afirmaría cosas que no se pueden abrir.
+
+---
+
 ## 2026-09-11 — Regeneración completa de `ia-db/`: versión 3.0
 
 **Generada por** `/IA/PROMPTs/IA.Prompts/Tool-Prompts/Indexado-Documentado/Iniciar-Indexado.md`,

@@ -1,0 +1,9 @@
+--- estado del sitio PUBLICADO, sin el arreglo ---
+ToHaveCountAsync(0) sobre «Se dibujaron»  ->  1 coincidencia(s)
+ToBeVisible «No dibujada»  ->  0 coincidencia(s)
+ToBeVisible «no se compararon»  ->  0 coincidencia(s)
+
+VEREDICTO:
+  ROJO · la pantalla afirma haber dibujado
+  ROJO · no dice que la figura no se dibujo
+  ROJO · no avisa que no pudo verificar
