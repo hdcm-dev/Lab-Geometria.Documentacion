@@ -9,6 +9,42 @@ diferencia se repara acá, nunca al revés.
 
 ---
 
+## 2026-10-26 — ia-db 4.0: regeneración completa sobre `4b114d7`
+
+El PO invocó `PROMPTs/Indexado/Crear-Indexado.md`, que ejecuta `Iniciar-Indexado.md` con el
+Profile `Knowledge-Indexing`. La 3.0 (2026-09-11) estaba sobre `89f3ab3`; desde entonces
+`Lab-Geometria` sumó **204 commits** (PR #187 a #233, 428 archivos). Como en la 3.0, «crear» se
+leyó como regenerar entera y no como actualizar.
+
+### Cambiado
+
+- `ia-db/README.md` y los trece índices de `ia-db/indexes/`, reescritos sobre `4b114d7`
+  (2026-09-15, etiqueta `v1.2.0`): cada magnitud se volvió a contar con instrumento y cada
+  afirmación se abrió en su fuente. Entre lo que cambió de contenido: la fase `i` realizada y
+  abierta, y la `k` cerrada; la solución pasa de 9 a 31 proyectos; los 17 puntos de acceso bajo
+  `/v1/`, el límite de tasa y las cabeceras de seguridad; el autorregistro por dominio; las tres
+  imágenes; los veinte samples; los 59 ADR, el expediente `0001` y las mesas del 2026-09-14 y del
+  2026-09-15. El detalle está en el manifiesto, `ia-db/README.md`.
+- Las cabeceras de los trece índices llevan ahora **Propósito**, **Fuente primaria** y
+  **Vigencia** (2026-10-26 sobre `4b114d7`). `Verificar` las exige desde esta versión.
+- `ia-db/indexes/12_Observaciones-Del-Indexado.md`: de las nueve observaciones de la 3.0, O-1 a O-3
+  siguen vigentes, O-4, O-5, O-6, O-8 y O-9 quedaron resueltas y O-7, resuelta a medias. Se suman
+  65 nuevas, O-10 a O-74. Ninguna se corrigió en `Lab-Geometria`: se registran con su evidencia.
+- `ia-db/README.md` §4: la fusión de un pull request de `Lab-Geometria` pasa a ser del agente, con
+  los controles en verde y sin reserva, como dice hoy su `AGENTS.md`. La 3.0 decía que era del PO.
+- `PROMPTs/Indexado/Crear-Indexado.md`: se versiona la edición del PO (la invocación con
+  `ultracode` y el pedido de cerrar con `Knowledge-Conformacion-Pull-Request-Automatico`), tal como
+  él la escribió.
+
+### Método
+
+Un workflow de 51 agentes: doce regeneradores, uno por índice del 00 al 11; dos escépticos por
+índice, uno para magnitudes y otro para trazabilidad, que intentaron refutar cada índice; una
+corrección de lo confirmado; el índice 12; un crítico de coherencia entre índices y el README.
+`Lab-Geometria` no se tocó.
+
+---
+
 ## 2026-10-26 — Delegación del merge y control `Verificar`
 
 Unidad previa a la ia-db 4.0: deja asentado cómo se entregan las unidades de este repositorio y
