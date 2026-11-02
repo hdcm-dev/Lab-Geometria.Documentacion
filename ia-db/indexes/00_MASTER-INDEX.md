@@ -155,3 +155,27 @@ El detalle, con su trazabilidad, está en
 
 Las ocho eventualidades completas, con lo que se probó y no funcionó, están en
 `SDD/Docs/Producto/11-Documentacion/Bitacora-Eventualidades.md`.
+
+## 8. Regla de entrega de la documentación (expediente 0003)
+
+Entrada agregada el 2026-11-02 sobre Lab-Geometria `main` `e1b21c8`, fuera de la regeneración de la 3.0
+(que sigue midiendo `89f3ab3`).
+
+| Pieza | Dónde | Qué fija |
+| --- | --- | --- |
+| Regla de entrega, `RD-GEO-002` | Lab-Geometria · [`docs-as-code/regla-de-entrega.md`](https://github.com/hdcm-dev/Lab-Geometria/blob/main/docs-as-code/regla-de-entrega.md) (texto en `:27-32`) | Todo documento de estos dos repositorios públicos lleva `delivery: publico`; el agente hereda la audiencia de su usuario y por este canal sólo recibe `publico` |
+| Registro de audiencias, `AUD-GEO-001` | Lab-Geometria · [`docs-as-code/AUD-geometria.md`](https://github.com/hdcm-dev/Lab-Geometria/blob/main/docs-as-code/AUD-geometria.md) | A quién se entrega cada pieza, con qué nivel y dónde se cumple |
+
+Texto de la regla, el mismo que en `regla-de-entrega.md:27-32`:
+
+```text
+Regla de entrega (expediente 0003). En Lab-Geometria y Lab-Geometria.Documentacion, ambos públicos, todo
+documento lleva `delivery: publico`; no se crean piezas `producto`, `restringido` ni `interno`. El agente
+hereda la audiencia de su usuario y por este canal sólo recibe `publico`. La ayuda de uso explica el campo
+y el formato; la discrepancia la comenta la capa de pistas (expediente 0002) y la ayuda no la duplica.
+La forma de la API es pública cuando `Documentacion:Publicada` está encendida (/openapi/v1.json,
+/documentacion); su instantánea la regenera la automatización. Control: `delivery-publico` en docs.yml.
+```
+
+Esta base es material `publico`. El control `delivery-publico` corre en Lab-Geometria
+(`scripts/docs-local.sh:87`); este repositorio no tiene compuerta propia.
