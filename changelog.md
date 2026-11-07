@@ -9,6 +9,22 @@ diferencia se repara acá, nunca al revés.
 
 ---
 
+## 2026-11-07 — `ia-db/` 4.0: regeneración completa sobre `5f07b12`
+
+### Cambiado
+
+- **`ia-db/` 4.0**, regenerada el 2026-11-01 con `PROMPTs/Indexado/Crear-Indexado.md` sobre Lab-Geometria
+  `main` `5f07b12` (PR #234): veinte índices, del `00` al `19`, en lugar de los trece de la 3.0. El manifiesto de
+  `ia-db/README.md` declara la revisión, las fuentes y la tabla «ruta cambiada → índices a revisar».
+- **La regla de entrega del expediente `0003`** (PR #4) pasa literal al nuevo `00_MASTER-INDEX.md` como §10;
+  en la 3.0 era el §8.
+
+### Decisiones
+
+- La 4.0 del 2026-10-26 (rama `ia-db/4.0`, PR #3, sobre `4b114d7`) queda superada por esta y se cierra sin fusionar.
+
+---
+
 ## 2026-09-13 — Se versionan `Analisis/` y `PROMPTs/`
 
 Hasta hoy el repositorio sólo llevaba `ia-db/` y este registro; el corpus de análisis y los prompts
