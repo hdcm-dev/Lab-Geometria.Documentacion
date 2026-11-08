@@ -9,6 +9,20 @@ diferencia se repara acá, nunca al revés.
 
 ---
 
+## 2026-11-08 — README de entrada y entrega integrada
+
+### Cambiado
+
+- **`README.md`** reescrito como superficie de entrada para agentes: qué es cada repositorio, el circuito entre
+  los dos, la anatomía, la `ia-db/`, la matriz de ruteo, las convenciones y el estado del árbol. La sección
+  **Entrega** de la unidad del 2026-10-26 (PR #2) queda al final, literal.
+- **`.github/scripts/verificar.py`** acepta la cabecera real de la 4.0 fusionada (PR #5): `**Propósito:**` con
+  dos puntos y la vigencia declarada como «Revisión indexada» o «Alcance de esta revisión». El control se había
+  escrito contra la otra 4.0 (PR #3), que se cerró sin fusionar.
+- Los enlaces del README a `PROMPTs/DEVs/` van como texto mientras la mudanza del PO no esté en `main`.
+
+---
+
 ## 2026-11-07 — `ia-db/` 4.0: regeneración completa sobre `5f07b12`
 
 ### Cambiado
@@ -22,6 +36,30 @@ diferencia se repara acá, nunca al revés.
 ### Decisiones
 
 - La 4.0 del 2026-10-26 (rama `ia-db/4.0`, PR #3, sobre `4b114d7`) queda superada por esta y se cierra sin fusionar.
+
+---
+
+## 2026-10-26 — Delegación del merge y control `Verificar`
+
+Unidad previa a la ia-db 4.0: deja asentado cómo se entregan las unidades de este repositorio y
+le da a la guarda de merge una corrida de controles que leer.
+
+### Agregado
+
+- `README.md` — sección **Entrega**: la delegación del merge al agente según
+  `Knowledge-Conformacion-Pull-Request-Automatico` 2.0 §3.1, con el literal del PO, su SHA-256,
+  la fecha, el techo de espera (20 min), el intervalo de relectura (20 s) y la excepción.
+- `.github/workflows/verificar.yml` y `.github/scripts/verificar.py` — el control `Verificar`:
+  enlaces internos fuera de `PROMPTs/` y forma de la `ia-db` (entrada única con manifiesto y
+  versión, índices `NN_` con título numerado y cabecera; **Fuente primaria** y **Vigencia** se
+  exigen desde la versión 4.0).
+
+### Decisiones
+
+- **El primer merge vuelve al PO.** La delegación todavía no está en `main` y el techo y el
+  intervalo los propuso el agente: es una reserva de §3.4 y se pide el merge.
+- **`PROMPTs/` no se comprueba.** Dos de sus archivos enlazan a un `Analisis/` que no existe con
+  ese nombre; son del PO y se dejan como él los escribió.
 
 ---
 
